@@ -1,94 +1,94 @@
--- Show unique birth years from patients and order them by ascending.
+-- Show unique birth years FROM patients and order them by ascending.
 SELECT DISTINCT YEAR(birth_date) AS birth_year
 FROM patients
 ORDER BY birth_year;
 
 /*
-Show unique first names from the patients table which only occurs once in the list.
+Show unique first names FROM the patients table which only occurs once in the list.
 For example, if two or more people are named 'John' in the first_name column then don't include their name in the output list. 
 If only 1 person is named 'Leo' then include them in the output.
 */
-select first_name from patients
-group by first_name having count(first_name) = 1;
+SELECT first_name FROM patients
+GROUP BY first_name HAVING COUNT(first_name) = 1;
 
 /*
-Show patient_id and first_name from patients where their first_name start and ends with 's' and is at least 6 characters long.
+Show patient_id and first_name FROM patients where their first_name start and ends with 's' and is at least 6 characters long.
 */
-select patient_id, first_name from patients
-where first_name like 's%s' and len(first_name) > 5;
+SELECT patient_id, first_name FROM patients
+WHERE first_name LIKE 's%s' AND LEN(first_name) > 5;
 
 /*
-Show patient_id, first_name, last_name from patients whos diagnosis is 'Dementia'.
+Show patient_id, first_name, last_name FROM patients whos diagnosis is 'Dementia'.
 Primary diagnosis is stored in the admissions table.
 */
-select patients.patient_id, first_name, last_name from patients
+SELECT patients.patient_id, first_name, last_name FROM patients
 JOIN admissions ON patients.patient_id = admissions.patient_id
-where diagnosis = 'Dementia';
+WHERE diagnosis = 'Dementia';
 
 /*
 Display every patient's first_name.
 Order the list by the length of each name and then by alphabetically.
 */
-select first_name from patients
-order by len(first_name), first_name;
+SELECT first_name FROM patients
+ORDER BY LEN(first_name), first_name;
 
---Show first name, last name, and gender of patients whose gender is 'M'
-select first_name, last_name, gender from patients
-where gender = 'M';
+-- Show first name, last name, and gender of patients whose gender is 'M'
+SELECT first_name, last_name, gender FROM patients
+WHERE gender = 'M';
 
 /*
 Show the total amount of male patients and the total amount of female patients in the patients table.
 Display the two results in the same row.
 */
 SELECT 
-  SUM(Gender = 'M') as male_count, 
+  SUM(Gender = 'M') AS male_count, 
   SUM(Gender = 'F') AS female_count
 FROM patients;
 
 /*
-Show first and last name, allergies from patients which have allergies to either 'Penicillin' or 'Morphine'. 
+Show first and last name, allergies FROM patients which have allergies to either 'Penicillin' or 'Morphine'. 
 Show results ordered ascending by allergies then by first_name then by last_name.
 */
 SELECT first_name, last_name, allergies FROM patients
-where allergies = 'Penicillin' or allergies = 'Morphine' 
-order by allergies, first_name, last_name;
+WHERE allergies = 'Penicillin' OR allergies = 'Morphine' 
+ORDER BY allergies, first_name, last_name;
 
--- Show patient_id, diagnosis from admissions. Find patients admitted multiple times for the same diagnosis.
-select patient_id, diagnosis from admissions
-group by patient_id, diagnosis
-having count(*) > 1;
+-- Show patient_id, diagnosis FROM admissions. Find patients admitted multiple times for the same diagnosis.
+SELECT patient_id, diagnosis FROM admissions
+GROUP BY patient_id, diagnosis
+HAVING COUNT(*) > 1;
 
 /*
 Show the city and the total number of patients in the city.
-Order from most to least patients and then by city name ascending.
+Order FROM most to least patients and then by city name ascending.
 */
-select city, count(*) as num_patients from patients
-group by city
-order by num_patients desc, city asc;
+SELECT city, COUNT(*) AS num_patients FROM patients
+GROUP BY city
+ORDER BY num_patients DESC, city ASC;
 
 /*
 Show first name, last name and role of every person that is either patient or doctor.
 The roles are either "Patient" or "Doctor"
 */
-SELECT first_name, last_name, 'Patient' as role FROM patients
+SELECT first_name, last_name, 'Patient' AS role FROM patients
 UNION ALL
-SELECT first_name, last_name, 'Doctor' as role FROM doctors;
+SELECT first_name, last_name, 'Doctor' AS role FROM doctors;
 
 /*
-Show all allergies ordered by popularity. Remove NULL values from query.
+Show all allergies ordered by popularity. Remove NULL values FROM query.
 */
-select allergies, count(*) as total_diagnosis from patients
-where allergies is not NULL
-group by allergies
-order by total_diagnosis desc;
+SELECT allergies, COUNT(*) AS total_diagnosis FROM patients
+WHERE allergies IS NOT NULL
+GROUP BY allergies
+ORDER BY total_diagnosis DESC;
 
 /*
 Show all patient's first_name, last_name, and birth_date who were born in the 1970s decade. 
-Sort the list starting from the earliest birth_date.
+Sort the list starting FROM the earliest birth_date.
 */
 SELECT first_name, last_name, birth_date FROM patients
-where year(birth_date) between 1970 and 1979
-order by birth_date asc;
+WHERE YEAR(birth_date) BETWEEN 1970 AND 1979
+ORDER BY birth_date ASC;
 
 /*
 We want to display each patient's full name in a single column. 
@@ -102,21 +102,21 @@ ORDER BY first_name DESC;
 /*
 Show the province_id(s), sum of height; where the total sum of its patient's height is greater than or equal to 7,000.
 */
-select province_id, sum(height) as sum_height from patients
-group by province_id
-having sum_height >= 7000;
+SELECT province_id, SUM(height) AS sum_height FROM patients
+GROUP BY province_id
+HAVING sum_height >= 7000;
 
 -- Show the difference between the largest weight and smallest weight for patients with the last name 'Maroni'
-select max(weight)-min(weight) from patients
-where last_name = 'Maroni';
+SELECT MAX(weight)-MIN(weight) FROM patients
+WHERE last_name = 'Maroni';
 
 /*
 Show all of the days of the month (1-31) and how many admission_dates occurred on that day. 
 Sort by the day with most admissions to least admissions.
 */
-select day(admission_date) as day_number, count(patient_id) as number_of_admissions from admissions
-group by day_number 
-order by number_of_admissions desc;
+SELECT DAY(admission_date) AS day_number, COUNT(patient_id) AS number_of_admissions FROM admissions
+GROUP BY day_number 
+ORDER BY number_of_admissions DESC;
 
 -- Show all columns for patient_id 542's most recent admission_date.
 SELECT *
@@ -134,80 +134,115 @@ SELECT patient_id, attending_doctor_id, diagnosis
 FROM admissions
 WHERE (attending_doctor_id IN (1, 5, 19) AND patient_id % 2 != 0) 
 OR
-(attending_doctor_id LIKE '%2%' AND len(patient_id) = 3);
+(attending_doctor_id LIKE '%2%' AND LEN(patient_id) = 3);
 
 -- Show first name and last name of patients who does not have allergies. (null)
-select first_name, last_name from patients
-where allergies IS NULL;
+SELECT first_name, last_name FROM patients
+WHERE allergies IS NULL;
 
 -- Show first name of patients that start with the letter 'C'
-select first_name from patients
-where first_name like 'c%';
+SELECT first_name FROM patients
+WHERE first_name LIKE 'c%';
 
 -- Show first name and last name of patients that weight within the range of 100 to 120 (inclusive)
-select first_name, last_name from patients
-where weight >= 100 and weight <= 120;
+SELECT first_name, last_name FROM patients
+WHERE weight >= 100 AND weight <= 120;
 
 /*
 Show first_name, last_name, and the total number of admissions attended for each doctor.
 Every admission has been attended by a doctor.
 */
-select first_name, last_name, count(*) from doctors
-join admissions ON admissions.attending_doctor_id = doctors.doctor_id
-group by attending_doctor_id;
+SELECT first_name, last_name, COUNT(*) FROM doctors
+JOIN admissions ON admissions.attending_doctor_id = doctors.doctor_id
+GROUP BY attending_doctor_id;
 
 -- For each doctor, display their id, full name, and the first and last admission date they attended.
-select doctor_id, first_name || " " || last_name as full_name, min(admission_date) as first_adm_date, max(admission_date) as last_adm_date from doctors
-join admissions ON admissions.attending_doctor_id = doctors.doctor_id
-group by attending_doctor_id;
+SELECT doctor_id, first_name || " " || last_name AS full_name, MIN(admission_date) AS first_adm_date, MAX(admission_date) AS last_adm_date FROM doctors
+JOIN admissions ON admissions.attending_doctor_id = doctors.doctor_id
+GROUP BY attending_doctor_id;
 
 -- Display the total amount of patients for each province. Order by descending.
-select province_name, count(*) as amount from patients
-join province_names ON province_names.province_id = patients.province_id
-group by province_name 
-order by amount desc;
+SELECT province_name, COUNT(*) AS amount FROM patients
+JOIN province_names ON province_names.province_id = patients.province_id
+GROUP BY province_name 
+ORDER BY amount DESC;
 
 /*
 For every admission, display the patient's full name, their admission diagnosis, and their doctor's full 
 name who diagnosed their problem.
 */
-select p.first_name || " " || p.last_name as patient_name, diagnosis, doctors.first_name || " " || doctors.last_name from patients as p
-join province_names ON province_names.province_id = p.province_id
-join admissions on admissions.patient_id = p.patient_id
-join doctors on admissions.attending_doctor_id = doctors.doctor_id;
+SELECT p.first_name || " " || p.last_name AS patient_name, diagnosis, doctors.first_name || " " || doctors.last_name FROM patients AS p
+JOIN province_names ON province_names.province_id = p.province_id
+JOIN admissions ON admissions.patient_id = p.patient_id
+JOIN doctors ON admissions.attending_doctor_id = doctors.doctor_id;
 
 /*
 display the first name, last name and number of duplicate patients based on their first name and last name.
 Ex: A patient with an identical name can be considered a duplicate.
 */
-select first_name, last_name, count(*) as total from patients 
-group by first_name, last_name
-having count(*) > 1
+SELECT first_name, last_name, COUNT(*) AS total FROM patients 
+GROUP BY first_name, last_name
+HAVING COUNT(*) > 1;
 
 /*
-Display patient's full name,
-height in the units feet rounded to 1 decimal,
-weight in the unit pounds rounded to 0 decimals,
-birth_date,
-gender non abbreviated.
-
-Convert CM to feet by dividing by 30.48.
-Convert KG to pounds by multiplying by 2.205.
+Display patient's full name, height in the units feet rounded to 1 decimal, weight in the unit pounds rounded
+to 0 decimals, birth_date, gender non abbreviated.
 */
 UPDATE patients
 SET gender = 'MALE'
 WHERE gender = 'M';
-update patients
-set gender = 'FEMALE'
-where gender = 'F';
-select p.first_name || " " || p.last_name as patient_name, round(height/30.48, 1), round(weight*2.205), birth_date, gender from patients as p
+
+UPDATE patients
+SET gender = 'FEMALE'
+WHERE gender = 'F';
+
+SELECT p.first_name || " " || p.last_name AS patient_name, ROUND(height/30.48, 1), ROUND(weight*2.205), birth_date, gender FROM patients AS p;
 
 /*
-Show patient_id, first_name, last_name from patients whose does not have any records in the admissions table. 
-(Their patient_id does not exist in any admissions.patient_id rows.)
+Show patient_id, first_name, last_name FROM patients whose does not have any records in the admissions table.
 */
 SELECT patient_id, first_name, last_name FROM patients
 WHERE patient_id NOT IN (
     SELECT patient_id
     FROM admissions
 );
+
+/*
+Display a single row with max_visits, min_visits, average_visits where the maximum, minimum and average number
+of admissions per day is calculated. Average is rounded to 2 decimal places.
+*/
+SELECT 
+    MAX(daily_visits) AS max_visits, 
+    MIN(daily_visits) AS min_visits, 
+    ROUND(AVG(daily_visits), 2) AS avg_visits
+FROM (
+    SELECT admission_date, COUNT(*) AS daily_visits
+    FROM admissions
+    GROUP BY admission_date
+);
+
+/*
+Display every patient that has at least one admission and show their most recent admission along with the
+patient and doctor's full name.
+*/
+SELECT p.first_name || ' ' || p.last_name AS patient_name,
+MAX(admission_date) AS most_recent_adm,
+d.first_name || ' ' || d.last_name AS doctor_full_name
+FROM patients p
+JOIN admissions adm ON adm.patient_id = p.patient_id
+JOIN doctors d ON d.doctor_id = adm.attending_doctor_id
+GROUP BY adm.patient_id
+HAVING COUNT(*) >= 1;
+
+/*
+Atividade de análise de quanto cada cidade gastou em cada produto, somando os valores das vendas e exibindo os 
+resultados do maior para o menor gasto, com ordenação adicional por cidade e produto.
+*/
+SELECT ci.city_name, p.product_name, ROUND(SUM(ii.line_total_price), 2) AS total_spent
+FROM city ci
+JOIN customer cu ON cu.city_id = ci.id
+JOIN invoice i ON i.customer_id = cu.id
+JOIN invoice_item ii ON ii.invoice_id = i.id
+JOIN product p ON p.id = ii.product_id
+GROUP BY ci.city_name, p.product_name
+ORDER BY total_spent DESC, ci.city_name ASC, p.product_name ASC;
