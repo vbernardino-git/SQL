@@ -66,3 +66,78 @@ SELECT DISTINCT
 FROM patients p
 
 JOIN admissions a ON a.patient_id = p.patient_id
+
+/*
+Each admission costs $50 for patients without insurance, and $10 for patients with insurance. 
+All patients with an even patient_id have insurance.
+Give each patient a 'Yes' if they have insurance, and a 'No' if they don't have insurance. 
+Add up the admission_total cost for each has_insurance group.
+*/
+SELECT
+  CASE
+    WHEN patient_id % 2 = 0 THEN 'Yes'
+    ELSE 'No'
+  END AS has_insurance,
+  SUM(
+    CASE
+      WHEN patient_id % 2 = 0 THEN 10
+      ELSE 50
+    END
+  ) AS admission_total
+FROM admissions
+GROUP BY
+  CASE
+    WHEN patient_id % 2 = 0 THEN 'Yes'
+    ELSE 'No'
+  END;
+
+/*
+Show the provinces that has more patients identified as 'M' than 'F'. Must only show full province_name
+*/
+SELECT
+  pn.province_name
+FROM patients p
+  JOIN province_names pn ON pn.province_id = p.province_id
+WHERE p.gender = 'M'
+GROUP BY pn.province_name
+HAVING COUNT(*) > (
+    SELECT COUNT(*)
+    FROM patients p2
+    WHERE
+      p2.gender = 'F'
+      AND p2.province_id = p.province_id
+  );
+
+/*
+We are looking for a specific patient. Pull all columns for the patient who matches the following criteria:
+- First_name contains an 'r' after the first two letters.
+- Identifies their gender as 'F'
+- Born in February, May, or December
+- Their weight would be between 60kg and 80kg
+- Their patient_id is an odd number
+- They are from the city 'Kingston'
+*/
+SELECT *
+FROM patients
+where
+  first_name like '__r%'
+  and gender = 'F'
+  and month(birth_date) in (2, 5, 12)
+  and weight between 60 and 80
+  and patient_id % 2 != 0
+  and city like 'Kingston';
+
+/*
+Show the percent of patients that have 'M' as their gender. Round the answer to the nearest hundreth number and in percent form.
+*/
+SELECT
+  ROUND(
+    SUM(
+      CASE
+        WHEN gender = 'M' THEN 1
+        ELSE 0
+      END
+    ) * 100.0 / COUNT(patient_id),
+    2
+  ) || '%' AS pct_male_patients
+FROM patients;
