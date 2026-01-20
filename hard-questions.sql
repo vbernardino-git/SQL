@@ -141,3 +141,52 @@ SELECT
     2
   ) || '%' AS pct_male_patients
 FROM patients;
+
+-- For each day display the total amount of admissions on that day. Display the amount changed from the previous date.
+SELECT
+  admission_date,
+  adms,
+  adms - LAG(adms) OVER (
+    ORDER BY
+      admission_date
+  ) AS change
+FROM (
+    SELECT
+      admission_date,
+      COUNT(*) as adms
+    FROM admissions
+    group by admission_date
+  )
+
+-- Sort the province names in ascending order in such a way that the province 'Ontario' is always on top.
+SELECT province_name
+FROM (
+    SELECT
+      province_name = 'Ontario' as verific,
+      *
+    FROM province_names
+    order by verific desc
+  )
+
+/*
+We need a breakdown for the total amount of admissions each doctor has started each year. 
+Show the doctor_id, doctor_full_name, specialty, year, total_admissions for that year.
+*/
+SELECT
+  doctor_id,
+  first_name || " " || last_name as full_name,
+  specialty,
+  YEAR(admission_date) as ano,
+  COUNT(*)
+FROM doctors
+  JOIN admissions a ON a.attending_doctor_id = doctors.doctor_id
+GROUP BY
+  full_name,
+  ano
+order by doctor_id
+
+
+-- INNER JOIN = parte central, junção de relacionamento entre as duas tabelas
+-- OUTER = aquilo que está fora do INNER
+-- LEFT JOIN / LEFT OUTER JOIN = Tudo aquilo dentro do INNER + aquilo que está do lado esquerdo (pode ter nulo)
+-- 
